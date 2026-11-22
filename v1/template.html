@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{Project Title} | Dylan Chua</title>
+  <meta name="description" content="{One-line pitch}" />
+  <meta name="theme-color" content="#f9f9f6" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💫</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://projects.thedylone.com/style/v1/project-kit.css" />
+  <!-- page-specific styles, if any, AFTER the kit -->
+  <script src="https://projects.thedylone.com/style/v1/project-kit.js" defer></script>
+</head>
+<body>
+  <header class="pk-header">
+    <div class="pk-header-inner">
+      <a class="pk-brand" href="https://projects.thedylone.com/">Dylan Chua</a>
+      <ul class="pk-nav">
+        <li><a href="https://projects.thedylone.com/">Projects</a></li>
+        <li><a href="https://github.com/thedylone/{repo}" target="_blank" rel="noreferrer">Source</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <main class="pk-main">
+    <section class="pk-hero pk-container">
+      <p class="pk-eyebrow">Project · {Category}</p>
+      <h1 class="pk-title">{Project Title}</h1>
+      <p class="pk-lede">{One or two sentences: what it is and why it matters.}</p>
+      <div class="pk-actions">
+        <a class="pk-btn" href="#{first-section}">{Primary action, e.g. Try the demo} <span aria-hidden="true">↓</span></a>
+        <a class="pk-btn pk-btn-secondary" href="https://github.com/thedylone/{repo}" target="_blank" rel="noreferrer">View code <span aria-hidden="true">→</span></a>
+      </div>
+      <ul class="pk-tags">
+        <li class="pk-tag">{Tech}</li>
+      </ul>
+      <!-- optional: <figure class="pk-figure pk-hero-media">…</figure> -->
+    </section>
+
+    <!-- optional section bar (v1.1): only for pages with 4+ sections, at most 7 links.
+         Labels = the section eyebrows without numbers. Needs project-kit.js. -->
+    <nav class="pk-subnav" aria-label="On this page">
+      <div class="pk-subnav-inner">
+        <ul>
+          <li><a href="#{first-section}">{Section}</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <section id="{first-section}" class="pk-section">
+      <div class="pk-container">
+        <p class="pk-eyebrow">01 — {Section}</p>
+        <h2 class="pk-h2">{Section heading in sentence case}</h2>
+        <div class="pk-prose"><p>…</p></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="pk-footer">
+    <div class="pk-footer-inner">
+      <span>© {YEAR} Dylan Chua</span>
+      <div class="pk-footer-links">
+        <a href="https://projects.thedylone.com/">All projects</a>
+        <a href="https://thedylone.pages.dev">Portfolio</a>
+        <a href="https://github.com/thedylone" target="_blank" rel="noreferrer">GitHub</a>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
