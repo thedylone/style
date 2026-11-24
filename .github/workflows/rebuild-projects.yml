@@ -1,0 +1,39 @@
+# Rebuilds every project page when the kit changes, so a change here reaches
+# all of them without a commit in each repo. Also runnable by hand from the Actions tab.
+#
+# Needs the PROJECTS_TOKEN secret: a fine-grained personal access token with
+# "Actions: Read and write" on the project repos below (see README).
+name: Rebuild project pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "v1/partials/**"
+      - "scripts/inject-kit.mjs"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        repo:
+          - bayesian-llm-geometry
+          - tile-segmentation-pipeline
+          - unity-drone-simulator
+          - image-compression
+          - baremetal-llama3
+          - FFT-accelerated
+          - black-scholes-numerical
+          - gorillatype
+          - laffey-bot
+    steps:
+      - name: Run pages.yml in thedylone/${{ matrix.repo }}
+        env:
+          GH_TOKEN: ${{ secrets.PROJECTS_TOKEN }}
+        run: gh workflow run pages.yml --repo "thedylone/${{ matrix.repo }}"
