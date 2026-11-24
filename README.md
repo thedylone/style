@@ -2,13 +2,14 @@
 
 The shared project page kit for every page under `projects.thedylone.com/<repo>/`.
 GitHub Pages serves this repo at **https://projects.thedylone.com/style/**, so all project pages
-load the same files and a change here reaches every page. There's no build step: the files are served as they are.
+load the same files and a change here reaches every page. The CSS and JS are served as they are; the header and footer are written into each page when it builds (see below).
 
 | File | URL |
 | --- | --- |
 | Stylesheet | `https://projects.thedylone.com/style/v1/project-kit.css` |
 | Section bar script | `https://projects.thedylone.com/style/v1/project-kit.js` |
 | Page skeleton | [`v1/template.html`](v1/template.html) |
+| Header and footer | [`v1/partials/`](v1/partials) (written into pages at build time) |
 
 ## Use it in a project
 
@@ -29,6 +30,52 @@ In a Vite project, put these tags in `index.html` and don't `import` the CSS, or
 2. Replace the `./project-kit.css` and `./project-kit.js` references with the URLs above.
 3. Check that the page looks the same. The hosted kit is v1.2, so first diff the old copy against it if the project has an older copy.
 
+## Build and deploy
+
+Every project page deploys through one shared workflow, [`.github/workflows/pages.yml`](.github/workflows/pages.yml).
+It checks out the project, runs its build if it has one, replaces the `.pk-header` and `.pk-footer` in every
+HTML page with [`v1/partials/header.html`](v1/partials/header.html) and [`footer.html`](v1/partials/footer.html),
+and deploys to GitHub Pages. The deployed pages carry the current header and footer as plain markup, with no JS.
+
+A project's own `.github/workflows/pages.yml` is just the call:
+
+```yaml
+name: Deploy project page
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: false
+jobs:
+  pages:
+    uses: thedylone/style/.github/workflows/pages.yml@main
+    with:
+      site: docs                      # folder to deploy (web/dist, . for the repo root, …)
+      # ref: project-page             # if the page lives on another branch
+      # build: npm ci && npm run build
+      # working-directory: web
+```
+
+The repo's **Settings → Pages → Source** must be **GitHub Actions**.
+Keep the copied header and footer in the project's HTML (or put `<!-- pk:header -->` and `<!-- pk:footer -->`
+where they go) so the page still looks right on a local server; the build overwrites them either way.
+To try the injection locally: `node scripts/inject-kit.mjs <built-site-dir> --repo thedylone/<repo>`.
+
+### Rebuilding every page
+
+Pushing a change to the partials, the script or the shared workflow runs
+[`rebuild-projects.yml`](.github/workflows/rebuild-projects.yml), which starts `pages.yml` in each project repo.
+You can also run it by hand from the Actions tab. Add new project repos to its list.
+
+It needs a repository secret named `PROJECTS_TOKEN`: a fine-grained personal access token with
+access to the project repos and the single permission **Actions: Read and write**.
+
 ## Versioning
 
 - The path holds the **major** version (`v1/`). Fixes and additions that keep existing pages working
@@ -40,8 +87,8 @@ In a Vite project, put these tags in `index.html` and don't `import` the CSS, or
 ## Rules
 
 **Structure (identical on every page)**
-- The header uses the exact `.pk-header` markup: brand "Dylan Chua" → https://projects.thedylone.com/,
-  with nav links "Projects" and "Source" only. Header height is fixed by the kit (3.5rem); don't add rows.
+- The header uses the exact `.pk-header` markup: brand "Dylan Chua" → https://thedylone.com,
+  with nav links "Projects" and "Source" only. The build writes it in from `v1/partials/header.html`. Header height is fixed by the kit (3.5rem); don't add rows.
 - The footer uses the exact `.pk-footer` markup: "© {YEAR} Dylan Chua" plus "All projects", "Portfolio", "GitHub".
 - Section links never go in the header. Use the optional section bar (`.pk-subnav`) instead:
   - only on pages with **4 or more** sections, with **at most 7** links (pick the main ones);

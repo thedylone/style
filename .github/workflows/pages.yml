@@ -1,0 +1,80 @@
+# Shared build for every project page under projects.thedylone.com/<repo>/.
+# Each project repo calls this from its own .github/workflows/pages.yml:
+#
+#   jobs:
+#     pages:
+#       uses: thedylone/style/.github/workflows/pages.yml@main
+#       with:
+#         site: docs
+#
+# It checks out the project, builds it if asked, writes the current kit header and
+# footer into every HTML page (scripts/inject-kit.mjs), and deploys to GitHub Pages.
+# The caller grants `pages: write` and `id-token: write`.
+name: Build project page
+
+on:
+  workflow_call:
+    inputs:
+      site:
+        description: Folder to deploy, after any build (e.g. docs, web/dist, or . for the repo root).
+        type: string
+        required: true
+      ref:
+        description: Branch holding the page, if it isn't the branch the caller runs on.
+        type: string
+        default: ""
+      build:
+        description: Shell command that builds the site, run in working-directory. Empty for a static site.
+        type: string
+        default: ""
+      working-directory:
+        description: Where the build command runs (and where package-lock.json lives).
+        type: string
+        default: "."
+      node-version:
+        type: string
+        default: "22"
+      kit-ref:
+        description: Branch or tag of thedylone/style to take the kit from.
+        type: string
+        default: main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+
+      - name: Fetch the kit
+        run: git clone --depth 1 --branch "${{ inputs.kit-ref }}" https://github.com/thedylone/style "$RUNNER_TEMP/kit"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node-version }}
+          cache: ${{ inputs.build != '' && 'npm' || '' }}
+          cache-dependency-path: ${{ inputs.working-directory }}/package-lock.json
+
+      - name: Build
+        if: inputs.build != ''
+        working-directory: ${{ inputs.working-directory }}
+        run: ${{ inputs.build }}
+
+      - name: Inject kit header and footer
+        run: node "$RUNNER_TEMP/kit/scripts/inject-kit.mjs" "${{ inputs.site }}"
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: ${{ inputs.site }}
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
